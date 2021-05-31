@@ -1,0 +1,96 @@
+﻿@page "/pagelivre"
+
+@using BibliBookDesktop.Data
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager UriHelper
+@inject LivreServices livreService
+
+
+<style>
+    body {
+        background-color: #d4e8fa;
+    }
+</style>
+
+<div class="container">
+        <button class="btn btn-secondary" @onclick=@CreationLivre>Ajouter</button>
+
+        <div class="row bg-light">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Nom</th>
+                        <th>Auteur</th>
+                        <th>Prix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Livres.Any())
+                    {
+                        @foreach (var livre in Livres)
+                        {
+                            <tr @onclick="(() => SetSelectedLivre(livre))">
+                                <td>@livre.Id</td>
+                                <td>@livre.Nom</td>
+                                <td>@livre.Auteur</td>
+                                <td>@livre.Prix</td>
+                                <td><button class="btn btn-secondary" @onclick="(() => UpdateLivre(livre))">Modifier</button></td>
+                                <td><button class="btn btn-danger" @onclick="(() => DeleteLivre(livre))">Supprimer</button></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6"><strong>Pas de livres disponibles</strong></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    @code {
+
+        List<Livre> Livres = new List<Livre>();
+        Livre CurrentLivre = new Livre();
+
+        protected override async Task OnInitializedAsync()
+        {
+            await RefreshLivres();
+        }
+
+        private async Task RefreshLivres()
+        {
+            Livres = await livreService.GetLivreAsync();
+
+            if (Livres != null && Livres.Count > 0)
+            {
+                CurrentLivre = Livres[0];
+            }
+        }
+
+        void CreationLivre()
+        {
+            UriHelper.NavigateTo("pagecreatelivre");
+        }
+
+        private async Task DeleteLivre(Livre livre)
+        {
+            await livreService.DeleteLivreAsync(livre);
+            await RefreshLivres();
+        }
+
+        private void UpdateLivre(Livre livre)
+        {
+            UriHelper.NavigateTo("pageupdatelivre/" + livre.Id.ToString());
+        }
+
+        private void SetSelectedLivre(Livre livre)
+        {
+            CurrentLivre = livre;
+        }
+    }
+

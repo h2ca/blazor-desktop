@@ -1,0 +1,72 @@
+﻿@page "/pagecreatelivre"
+
+
+@using BibliBookDesktop.Data
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager UriHelper
+@inject LivreServices livreService
+
+<style>
+    body {
+        background-color: #d4e8fa;
+    }
+</style>
+
+<div class="modal" tabindex="-1" role="dialog" style="display:block" id="taskModal">
+    <div class="modal-dialog shadow-lg bg-white rounded" role="document">
+        <div class="modal-content" style="background-color :#f0f0f0;">
+            <div class="modal-header" style="background-color: #d3e5e6;">
+                <h5 class="modal-title">Ajout d'un nouveau livre</h5>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <EditForm Model="@NewLivre">
+                        <div class="form-group">
+                            <label for="nom">Nom</label>
+                            <input type="text" id="nom" class="form-control" autocomplete="off" @bind-value="@NewLivre.Nom" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="auteur">Auteur</label>
+                            <input type="text" id="auteur" class="form-control" autocomplete="off" @bind-value="@NewLivre.Auteur" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prix">Prix</label>
+                            <input type="number" id="prix" class="form-control" autocomplete="off" @bind-value="@NewLivre.Prix" />
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" @onclick="AddNewLivre">Ajouter</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CancelSubmit">Annuler</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public Livre NewLivre { get; set; } = new Livre();
+
+    private async Task AddNewLivre()
+    {
+        if (NewLivre.Nom != null && NewLivre.Auteur != null && NewLivre.Prix != null)
+        {
+            await livreService.AddLivreAsync(NewLivre);
+            UriHelper.NavigateTo("pagelivre");
+        }
+        else
+        {
+            //
+        }
+    }
+
+    private void CancelSubmit()
+    {
+        UriHelper.NavigateTo("pagelivre");
+    }
+}
